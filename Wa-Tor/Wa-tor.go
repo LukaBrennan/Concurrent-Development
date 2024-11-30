@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	row := 100
-	col := 100
+	row := 5
+	col := 5
 	blue := "\033[34m"
 	reset := "\033[0m"
 	fish := ">('>"
@@ -30,11 +30,63 @@ func main() {
 		}
 	}
 
+	fmt.Println("Current Fish:")
+	printFishtank(fishtank)
+
+	movefish(fishtank)
+
+	fmt.Println("Moved Fish:")
+	printFishtank(fishtank)
+}
+
+func printFishtank(fishtank [][]string) {
 	for i := range fishtank {
 		for j := range fishtank[i] {
 			fmt.Print(fishtank[i][j], " ")
 		}
 		fmt.Println()
+	}
+}
+
+func movefish(fishtank [][]string) {
+	row := len(fishtank)
+	col := len(fishtank)
+
+	for i := 0; i < row; i++ {
+		for j := 0; j < col; j++ {
+			if fishtank[i][j] != "_" {
+				move(fishtank, i, j, row, col)
+			}
+		}
+	}
+}
+
+func move(fishtank [][]string, x, y, row, col int) {
+	directions := [][2]int{
+		{-1, 0}, // Up
+		{1, 0},  // Down
+		{0, -1}, // Left
+		{0, 1},  // Right
+	}
+	rand.Shuffle(len(directions), func(i, j int) {
+		directions[i], directions[j] = directions[j], directions[i]
+	})
+
+	// For this we try each direction, "_" is used as becasue the index of the direction is not needed jsut the value "dir"
+	for _, dir := range directions {
+		// These are the new movements of the fish
+		newX, newY := x+dir[0], y+dir[1]
+
+		// Making sure that these new movements are within bounds
+		if newX >= 0 && newX < row && newY >= 0 && newY < col {
+			// If the new position is empty, move the fish there
+			if fishtank[newX][newY] == "_" {
+				// Move the fish
+				fishtank[newX][newY] = fishtank[x][y]
+				fishtank[x][y] = "_"
+				return
+			}
+		}
 	}
 }
 

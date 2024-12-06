@@ -17,61 +17,57 @@
 //--------------------------------------------
 // Author: Joseph Kehoe (Joseph.Kehoe@setu.ie)
 // Created on 30/9/2024
-// Modified by: Luka Brennan
+// Modified by:
+// Description:
+// A simple barrier implemented using mutex and unbuffered channel
 // Issues:
-// The barrier is not implemented!
+// None I hope
+//1. Change mutex to atomic variable
+//2. Make it a reusable barrier
 //--------------------------------------------
 
 package main
 
 import (
-	"context"
 	"fmt"
 	"sync"
 	"time"
-
-	"golang.org/x/sync/semaphore"
 )
 
 // Place a barrier in this function --use Mutex's and Semaphores
-func doStuff(goNum int, arrived int, wg *sync.WaitGroup, thelock *sync.Mutex, sem *semaphore.Weighted, ctx context.Context) bool { // add *arrived and semaphoere.waited , max int
-
+func doStuff(goNum int, arrived *int, max int, wg *sync.WaitGroup, sharedLock *sync.Mutex, theChan chan bool) bool {
+	time.Sleep(time.Second)
 	fmt.Println("Part A", goNum)
 	//we wait here until everyone has completed part A
-	//for i := 0; i < goNum; i++ {
-	if arrived == 0 {
-		thelock.Lock()
-		time.Sleep(time.Nanosecond)
-		arrived++
-		sem.Acquire(ctx, 1)
-		sem.Release(1)
-		thelock.Unlock()
-
-	} else {
-		thelock.Lock()
-		time.Sleep(time.Nanosecond)
-		arrived++
-		sem.Acquire(ctx, 1)
-		sem.Release(1)
-		thelock.Unlock()
-	}
-	//}
+	sharedLock.Lock()
+	*arrived++
+	if *arrived == max { //last to arrive -signal others to go
+		sharedLock.Unlock() //unlock before any potentially blocking code
+		theChan <- true
+		<-theChan
+	} else { //not all here yet we wait until signal
+		sharedLock.Unlock() //unlock before any potentially blocking code
+		<-theChan
+		theChan <- true //once we get through send signal to next routine to continue
+	} //end of if-else
+	sharedLock.Lock()
+	*arrived--
+	sharedLock.Unlock()
 	fmt.Println("PartB", goNum)
 	wg.Done()
 	return true
-}
+} //end-doStuff
 
 func main() {
-	arrived := 0
 	totalRoutines := 10
+	arrived := 0
 	var wg sync.WaitGroup
 	wg.Add(totalRoutines)
 	//we will need some of these
-	ctx := context.TODO()
 	var theLock sync.Mutex
-	sem := semaphore.NewWeighted(int64(totalRoutines))
+	theChan := make(chan bool)     //use unbuffered channel in place of semaphore
 	for i := range totalRoutines { //create the go Routines here
-		go doStuff(i, arrived, &wg, &theLock, sem, ctx) // add &arrived, &sem
+		go doStuff(i, &arrived, totalRoutines, &wg, &theLock, theChan)
 	}
 	wg.Wait() //wait for everyone to finish before exiting
-}
+} //end-main

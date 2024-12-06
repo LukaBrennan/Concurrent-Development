@@ -11,7 +11,7 @@ func main() {
 	col := 5
 	blue := "\033[34m"
 	reset := "\033[0m"
-	fish := ">('>"
+	fish := "f"
 	water := "_"
 	//fishbreedtime := 3
 
@@ -82,10 +82,10 @@ func move(fishtank [][]string, x, y, row, col int) {
 			// If the new position is empty, move the fish there
 			if fishtank[newX][newY] == "_" {
 				// Move the fish
-				fishtank[newX][newY] = fishtank[x][y]
-				fishtank[x][y] = "_"
-				return
+
 			}
+			fishtank[newX][newY] = fishtank[x][y]
+			fishtank[x][y] = "_"
 		}
 	}
 }

@@ -3,19 +3,10 @@
 This project demonstrates a **Reusable Barrier** mechanism implemented in Go, developed by **Luka Brennan**. The solution uses **atomic variables**, **channels**, and **goroutines** to coordinate concurrent tasks effectively. The barrier is **reusable** and ensures all goroutines synchronize at specific points during execution.
 ## How to Run the Code
 
-Follow these steps to execute the program:
-
-1. **Download the File**:
-   - Download the `ReusableBarrier.go` file to your local machine.
-
-2. **Open a Terminal**:
-   - Navigate to the directory containing `ReusableBarrier.go` using your terminal or IDE.
-
-3. **Run the Program**:
-   - Execute the following command:
-     ```bash
-     go run "ReusableBarrier.go"
-     ```
+1. Download the zip folder and save it someware - then unzip it
+2. Open a terminal and navigate to the file's directory where the saved file is.
+3. Run the file using:
+   go run "Lab4-reusablebarrier/ReusableBarrier.go"
 
 4. **Observe the Output**:
    - The program will print logs showing synchronization points (`Part A` and `Part B`) for each goroutine.
